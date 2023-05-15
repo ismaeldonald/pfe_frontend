@@ -17,14 +17,6 @@ pipeline {
                 '''
             }
         }
-        stage('reposition') {
-            steps {
-                
-                sh '''
-                cd frontend
-                '''
-            }
-        }
         stage('Build') {
             steps {
                 echo "Building.."
