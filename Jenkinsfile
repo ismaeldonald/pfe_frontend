@@ -56,6 +56,7 @@ pipeline {
                 stage('Docker Push') {
                     steps {
                         sh 'docker push ismaeldn/frontend:$BUILD_ID'
+                        sh 'docker push ismaeldn/frontend:latest'
                     }
                 }
             }
@@ -65,6 +66,7 @@ pipeline {
 	post {
 		always {
 			sh '''
+            docker rmi frontend:$BUILD_ID || true
             docker rmi frontend:latest || true
             docker logout
             '''
