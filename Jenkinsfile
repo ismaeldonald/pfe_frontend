@@ -1,42 +1,61 @@
 pipeline {
     agent any
-    environment {
-        // Ajouter la variable dh_cred comme variables d'authentification
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    triggers {
+        pollSCM 'H/5 * * * *'
     }
+    tools {
+        nodejs "Default"
+        dockerTool "Default"
+    }
+    
+	environment {
+		DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+	}
+	
     stages {
+        stage('Initialisation Compilation') {
+            stages {
+                stage('Init') {
+                    steps {
+                        echo "Installing packages.."
+                        sh '''
+                        npm install --legacy-peer-deps
+                        npm install --save-dev karma --legacy-peer-deps
+                        npm install --save-dev karma-chrome-launcher --legacy-peer-deps
+                        '''
+                    }
+                }
+                stage('Test') {
+                    steps {
+                        echo "Testing.."
+                    }
+                }
+                stage('Package de l\'application') {
+                    steps {
+                        echo "Building.."
+                        sh '''
+                        npm run build
+                        '''
+                    }
+                }
+                stage('Login Docker Hub') {
+                    steps {
+                        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                    }
+                }
+                stage('Construction de l\'image') {
+                    steps {
+                        sh 'docker image build \
+                        -t frontend:latest .'
+                    }
+                }
+                stage('Docker Push') {
+                    steps {
+                        sh 'docker push frontend:latest'
+                    }
+                }
+            }
+        }
        
-        stage('Init'){
-            steps{
-                // Permet l'authentification
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-            }
-        }
-        stage('Test'){
-            steps{
-                // Démarre les tests unitaires
-                sh 'make test'
-            }
-        }
-        stage('Build'){
-            steps {
-                //Changer "epsdevops" avec votre username sur DockerHub
-                sh 'docker build -t ismaeldn/frontend:$BUILD_ID -f build/Dockerfile .'
-            }
-        }
-        stage('Deliver'){
-            steps {
-                //Changer "epsdevops" avec votre username sur DockerHub
-                sh 'docker push ismaeldn/frontend:$BUILD_ID'
-            }
-        }
-        stage('Cleanup'){
-            steps {
-                //Changer "epsdevops" avec votre username sur DockerHub
-                sh 'docker rmi ismaeldn/frontend:$BUILD_ID'
-                sh 'docker logout'
-            }
-        }
     }
 }
-
