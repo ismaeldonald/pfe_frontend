@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
     triggers {
@@ -11,58 +12,38 @@ pipeline {
 	environment {
 		DOCKERHUB_CREDENTIALS = credentials('dockerhub')
 	}
-	
-    stages {
-        stage('Initialisation Compilation') {
-            agent {
-                docker { image 'node:20-alpine' }
-            }
-            stages {
-                stage('Init') {
-                    steps {
-                        echo "Installing packages.."
-                        sh '''
-                        npm install --legacy-peer-deps
-                        npm install --save-dev karma --legacy-peer-deps
-                        npm install --save-dev karma-chrome-launcher --legacy-peer-deps
-                        '''
-                    }
-                }
-                stage('Test') {
-                    steps {
-                        echo "Testing.."
-                    }
-                }
-                stage('Package de l\'application') {
-                    steps {
-                        echo "Building.."
-                        sh '''
-                        npm run build
-                        '''
-                    }
-                }
+	 
+        stage('Init'){
+            steps{
+                // Permet l'authentification
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
-        stage('Construction docker') {
-            stages {
-                stage('Construction de l\'image') {
-                    steps {
-                        sh 'docker image build \
-                        -t frontend:latest .'
-                    }
-                }
-                stage('Login Docker Hub') {
-                    steps {
-                        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                    }
-                }
-                stage('Docker Push') {
-                    steps {
-                        sh 'docker push frontend:latest'
-                    }
-                }
+        stage('Test'){
+            steps{
+                // Démarre les tests unitaires
+                sh 'make test'
             }
         }
-       
+        stage('Build'){
+            steps {
+                //Changer "epsdevops" avec votre username sur DockerHub
+                sh 'docker build -t ismaeldn/frontend:$BUILD_ID -f build/Dockerfile .'
+            }
+        }
+        stage('Deliver'){
+            steps {
+                //Changer "epsdevops" avec votre username sur DockerHub
+                sh 'docker push ismaelddn/frontend:$BUILD_ID'
+            }
+        }
+        stage('Cleanup'){
+            steps {
+                //Changer "epsdevops" avec votre username sur DockerHub
+                sh 'docker rmi ismaeldn/frontend:$BUILD_ID'
+                sh 'docker logout'
+            }
+        }
     }
 }
+
