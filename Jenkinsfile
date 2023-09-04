@@ -5,11 +5,16 @@ pipeline {
     }
     tools {
         nodejs "Default"
+        dockerTool "Default"
     }
     
 	
     stages {
-       
+        stage('Initialisation Compilation') {
+            agent {
+                docker { image 'node:20-alpine' }
+            }
+            stages {
                 stage('Init') {
                     steps {
                         echo "Installing packages.."
@@ -33,7 +38,8 @@ pipeline {
                         '''
                     }
                 }
-            
+            }
+        }
        
     }
 }
