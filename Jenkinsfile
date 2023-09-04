@@ -8,12 +8,12 @@ pipeline {
         dockerTool "Default"
     }
     
+	environment {
+		DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials-ismaeldn')
+	}
 	
     stages {
         stage('Initialisation Compilation') {
-            agent {
-                docker { image 'node:20-alpine' }
-            }
             stages {
                 stage('Init') {
                     steps {
@@ -36,6 +36,26 @@ pipeline {
                         sh '''
                         npm run build
                         '''
+                    }
+                }
+            }
+        }
+        stage('Construction docker') {
+            stages {
+                stage('Construction de l\'image') {
+                    steps {
+                        sh 'docker image build \
+                        -t frontend:latest . --no-cache --rm'
+                    }
+                }
+                stage('Login Docker Hub') {
+                    steps {
+                        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                    }
+                }
+                stage('Docker Push') {
+                    steps {
+                        sh 'docker push frontend:latest'
                     }
                 }
             }
