@@ -1,18 +1,11 @@
-
 pipeline {
     agent any
-    triggers {
-        pollSCM 'H/5 * * * *'
+    environment {
+        // Ajouter la variable dh_cred comme variables d'authentification
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
-    tools {
-        nodejs "Default"
-        dockerTool "Default"
-    }
-    
-	environment {
-		DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-	}
-	 
+    stages {
+       
         stage('Init'){
             steps{
                 // Permet l'authentification
@@ -34,7 +27,7 @@ pipeline {
         stage('Deliver'){
             steps {
                 //Changer "epsdevops" avec votre username sur DockerHub
-                sh 'docker push ismaelddn/frontend:$BUILD_ID'
+                sh 'docker push ismaeldn/frontend:$BUILD_ID'
             }
         }
         stage('Cleanup'){
