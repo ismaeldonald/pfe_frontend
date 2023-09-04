@@ -9,7 +9,7 @@ pipeline {
     }
     
 	environment {
-		DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials-ismaeldn')
+		DOCKERHUB_CREDENTIALS = credentials('dockerhub')
 	}
 	
     stages {
