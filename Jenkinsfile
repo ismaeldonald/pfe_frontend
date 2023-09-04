@@ -45,7 +45,7 @@ pipeline {
                 stage('Construction de l\'image') {
                     steps {
                         sh 'docker image build \
-                        -t frontend:latest . --no-cache --rm'
+                        -t frontend:latest .'
                     }
                 }
                 stage('Login Docker Hub') {
