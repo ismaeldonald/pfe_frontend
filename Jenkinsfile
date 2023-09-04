@@ -21,7 +21,6 @@ pipeline {
                     steps {
                         echo "Installing packages.."
                         sh '''
-                        cd frontend
                         npm install --legacy-peer-deps
                         npm install --save-dev karma --legacy-peer-deps
                         npm install --save-dev karma-chrome-launcher --legacy-peer-deps
@@ -37,7 +36,6 @@ pipeline {
                     steps {
                         echo "Building.."
                         sh '''
-                        cd frontend
                         npm run build
                         '''
                     }
