@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 @Component({
   template: `
     <app-page-header icon="home">
-      <h2>Home</h2>
+      <h2>Home PFE</h2>
 
       <button
         routerLink="/sales"
