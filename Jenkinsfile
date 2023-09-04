@@ -44,7 +44,8 @@ pipeline {
                 stage('Construction de l\'image') {
                     steps {
                         sh 'docker image build \
-                        -t ismaeldn/frontend:$BUILD_ID .'
+                        -t ismaeldn/frontend:$BUILD_ID \
+                        -t ismaeldn/frontend:latest . --no-cache --rm'
                     }
                 }
                 stage('Login Docker Hub') {
