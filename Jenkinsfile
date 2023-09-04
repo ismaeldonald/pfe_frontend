@@ -61,4 +61,12 @@ pipeline {
         }
        
     }
+	post {
+		always {
+			sh '''
+            docker rmi frontend:latest || true
+            docker logout
+            '''
+		}
+	}
 }
