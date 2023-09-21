@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: frontend
 spec:
-  replicas: 3
   selector:
     matchLabels:
       app: frontend
@@ -14,10 +13,10 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ismaeldn/frontend
+        image: ismaeldn/frontend  
         resources:
           limits:
-            memory: "500Mi"
-            cpu: "1500m"
+            memory: "128Mi"
+            cpu: "500m"
         ports:
         - containerPort: 80
